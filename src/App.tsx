@@ -29,7 +29,7 @@ function App() {
         currentSize++;
         div.style.fontSize = `${currentSize}px`;
       }
-      currentSize--;
+      currentSize = Math.min(originalFontSize, currentSize - 1);
       div.style.fontSize = `${currentSize}px`;
     }
   }
