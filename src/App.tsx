@@ -27,6 +27,9 @@ function App() {
     } else if (currentSize < originalFontSize) {
       while (!isOverflown(div)) {
         currentSize++;
+        if (currentSize > originalFontSize) {
+          break;
+        }
         div.style.fontSize = `${currentSize}px`;
       }
       currentSize = Math.min(originalFontSize, currentSize - 1);
