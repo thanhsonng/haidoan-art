@@ -1,9 +1,47 @@
-import { useState } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import reactLogo from './assets/react.svg'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const divRef = useRef<HTMLDivElement>(null);
+  const originalFontSizeRef = useRef<number | null>(null);
+
+  const isOverflown = (element: HTMLElement) => {
+    return element.scrollHeight > element.clientHeight;
+  }
+
+  const adaptFontSize = () => {
+    const div = divRef.current;
+    const originalFontSize = originalFontSizeRef.current;
+
+    if (!div || !originalFontSize) {
+      return;
+    }
+
+    let currentSize = parseInt(window.getComputedStyle(div, null).getPropertyValue('font-size'));
+    if (isOverflown(div)) {
+      while (isOverflown(div)) {
+        currentSize--;
+        div.style.fontSize = `${currentSize}px`;
+      }
+    } else if (currentSize < originalFontSize) {
+      while (!isOverflown(div)) {
+        currentSize++;
+        div.style.fontSize = `${currentSize}px`;
+      }
+      currentSize--;
+      div.style.fontSize = `${currentSize}px`;
+    }
+  }
+
+  useEffect(() => {
+    const div = divRef.current;
+    if (!div) {
+      return;
+    }
+    const size = parseInt(window.getComputedStyle(div, null).getPropertyValue('font-size'));
+    originalFontSizeRef.current = size;
+  }, []);
 
   return (
     <div className="App">
@@ -15,18 +53,9 @@ function App() {
           <img src={reactLogo} className="logo react" alt="React logo" />
         </a>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
+      <div ref={divRef} className="dynamic-text" contentEditable onInput={adaptFontSize}>
+        Dynamic text
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </div>
   )
 }
