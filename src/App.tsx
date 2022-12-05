@@ -60,6 +60,11 @@ function App() {
     const socket = new WebSocket('wss://haidoan-art.herokuapp.com:443');
 
     socket.addEventListener('message', (event) => {
+      if (event.data === 'ping') {
+        socket.send('pong');
+        return;
+      }
+
       let parsedData;
 
       try {
