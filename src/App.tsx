@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, KeyboardEventHandler } from 'react'
 import reactLogo from './assets/react.svg'
 import './App.css'
 
@@ -38,11 +38,12 @@ function App() {
     }
   }
 
-  const sendData = () => {
-    if (!socketRef.current) {
+  const detectEnterKeypress: KeyboardEventHandler<HTMLDivElement> = (event) => {
+    const socket = socketRef.current;
+    if (!socket || event.key !== 'Enter') {
       return;
     }
-    socketRef.current.send(JSON.stringify({ type: 'DONE' }));
+    socket.send(JSON.stringify({ type: 'DONE' }));
   }
 
   useEffect(() => {
@@ -68,10 +69,15 @@ function App() {
           <img src={reactLogo} className="logo react" alt="React logo" />
         </a>
       </div>
-      <div ref={divRef} className="dynamic-text" contentEditable onInput={adaptFontSize}>
+      <div
+        ref={divRef}
+        className="dynamic-text"
+        contentEditable
+        onInput={adaptFontSize}
+        onKeyDown={detectEnterKeypress}
+      >
         Dynamic text
       </div>
-      <button type="button" onClick={sendData}>Send data</button>
     </div>
   )
 }
