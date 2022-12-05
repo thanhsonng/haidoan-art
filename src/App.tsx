@@ -43,7 +43,7 @@ function App() {
     if (!socket || event.key !== 'Enter') {
       return;
     }
-    socket.send(JSON.stringify({ type: 'DONE' }));
+    socket.send(JSON.stringify({ type: 'FORM_DONE' }));
   }
 
   useEffect(() => {
