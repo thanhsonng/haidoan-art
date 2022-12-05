@@ -10,9 +10,9 @@
 }
 
 .dynamic-text {
-  width: 300px;
-  height: 100px;
-  font-size: 50px;
+  width: 80vw;
+  height: 70vh;
+  font-size: 200px;
   line-height: 1;
   margin-top: 0;
   text-transform: uppercase;
