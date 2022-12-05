@@ -57,6 +57,13 @@ function App() {
 
   useEffect(() => {
     socketRef.current = new WebSocket('wss://haidoan-art.herokuapp.com:443');
+    return () => {
+      if (!socketRef.current) {
+        return;
+      }
+      socketRef.current.close();
+      socketRef.current = null;
+    };
   }, []);
 
   return (
