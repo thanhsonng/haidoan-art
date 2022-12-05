@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import reactLogo from './assets/react.svg'
 import './App.css'
 
 function App() {
   const divRef = useRef<HTMLDivElement>(null);
   const originalFontSizeRef = useRef<number | null>(null);
+  const socketRef = useRef<WebSocket | null>(null);
 
   const isOverflown = (element: HTMLElement) => {
     return element.scrollHeight > element.clientHeight;
@@ -37,6 +38,13 @@ function App() {
     }
   }
 
+  const sendData = () => {
+    if (!socketRef.current) {
+      return;
+    }
+    socketRef.current.send(JSON.stringify({ type: 'DONE' }));
+  }
+
   useEffect(() => {
     const div = divRef.current;
     if (!div) {
@@ -44,6 +52,10 @@ function App() {
     }
     const size = parseInt(window.getComputedStyle(div, null).getPropertyValue('font-size'));
     originalFontSizeRef.current = size;
+  }, []);
+
+  useEffect(() => {
+    socketRef.current = new WebSocket('wss://haidoan-art.herokuapp.com:443');
   }, []);
 
   return (
@@ -59,6 +71,7 @@ function App() {
       <div ref={divRef} className="dynamic-text" contentEditable onInput={adaptFontSize}>
         Dynamic text
       </div>
+      <button type="button" onClick={sendData}>Send data</button>
     </div>
   )
 }
