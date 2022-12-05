@@ -42,12 +42,14 @@
   font-size: 50px;
   line-height: 1;
   margin-top: 0;
-  padding: 1rem;
   text-transform: uppercase;
+  font-family: 'fk_grotesk_neuethin';
   outline: none;
+  border: none;
+  resize: none;
   overflow-wrap: break-word;
 }
 
-.dynamic-text.is-submitting {
+.dynamic-text:disabled {
   background-color: lightgray;
 }

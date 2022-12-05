@@ -1,10 +1,11 @@
-import { useEffect, useRef, KeyboardEventHandler, useState } from 'react'
+import { useEffect, useRef, KeyboardEventHandler, useState, ChangeEventHandler } from 'react'
 import './App.css'
 
 function App() {
-  const divRef = useRef<HTMLDivElement>(null);
+  const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const originalFontSizeRef = useRef<number | null>(null);
   const socketRef = useRef<WebSocket | null>(null);
+  const [input, setInput] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const isOverflown = (element: HTMLElement) => {
@@ -12,33 +13,38 @@ function App() {
   }
 
   const adaptFontSize = () => {
-    const div = divRef.current;
+    const textArea = textAreaRef.current;
     const originalFontSize = originalFontSizeRef.current;
 
-    if (!div || !originalFontSize) {
+    if (!textArea || !originalFontSize) {
       return;
     }
 
-    let currentSize = parseInt(window.getComputedStyle(div, null).getPropertyValue('font-size'));
-    if (isOverflown(div)) {
-      while (isOverflown(div)) {
+    let currentSize = parseInt(window.getComputedStyle(textArea, null).getPropertyValue('font-size'));
+    if (isOverflown(textArea)) {
+      while (isOverflown(textArea)) {
         currentSize--;
-        div.style.fontSize = `${currentSize}px`;
+        textArea.style.fontSize = `${currentSize}px`;
       }
     } else if (currentSize < originalFontSize) {
-      while (!isOverflown(div)) {
+      while (!isOverflown(textArea)) {
         currentSize++;
         if (currentSize > originalFontSize) {
           break;
         }
-        div.style.fontSize = `${currentSize}px`;
+        textArea.style.fontSize = `${currentSize}px`;
       }
       currentSize = Math.min(originalFontSize, currentSize - 1);
-      div.style.fontSize = `${currentSize}px`;
+      textArea.style.fontSize = `${currentSize}px`;
     }
   }
 
-  const detectEnterKeypress: KeyboardEventHandler<HTMLDivElement> = (event) => {
+  const handleChange: ChangeEventHandler<HTMLTextAreaElement> = (event) => {
+    setInput(event.target.value);
+    adaptFontSize();
+  }
+
+  const detectEnterKeypress: KeyboardEventHandler<HTMLTextAreaElement> = (event) => {
     const socket = socketRef.current;
     if (!socket || event.key !== 'Enter') {
       return;
@@ -48,11 +54,11 @@ function App() {
   }
 
   useEffect(() => {
-    const div = divRef.current;
-    if (!div) {
+    const textArea = textAreaRef.current;
+    if (!textArea) {
       return;
     }
-    const size = parseInt(window.getComputedStyle(div, null).getPropertyValue('font-size'));
+    const size = parseInt(window.getComputedStyle(textArea, null).getPropertyValue('font-size'));
     originalFontSizeRef.current = size;
   }, []);
 
@@ -75,10 +81,13 @@ function App() {
 
       if (parsedData.type === 'TD_DONE') {
         setIsSubmitting(false);
-        if (divRef.current) {
-          divRef.current.textContent = '';
-          divRef.current.focus();
-        }
+        setInput('');
+        setTimeout(() => {
+          if (textAreaRef.current && originalFontSizeRef.current) {
+            textAreaRef.current.focus();
+            textAreaRef.current.style.fontSize = `${originalFontSizeRef.current}px`;
+          }
+        }, 0);
       }
     });
 
@@ -92,16 +101,16 @@ function App() {
 
   return (
     <div className="App">
-      <div
-        ref={divRef}
-        className={`${isSubmitting ? 'is-submitting' : ''} dynamic-text`}
-        contentEditable={!isSubmitting}
-        onInput={adaptFontSize}
+      <textarea
+        ref={textAreaRef}
+        className="dynamic-text"
+        placeholder="Dynamic text"
+        autoFocus
+        value={input}
+        onChange={handleChange}
         onKeyDown={detectEnterKeypress}
-        tabIndex={0}
-      >
-        Dynamic text
-      </div>
+        disabled={isSubmitting}
+      />
     </div>
   )
 }
