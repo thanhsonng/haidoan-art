@@ -45,3 +45,7 @@
   margin-top: 0;
   padding: 1rem;
 }
+
+.dynamic-text.is-submitting {
+  background-color: lightgray;
+}

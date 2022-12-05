@@ -1,10 +1,11 @@
-import { useEffect, useRef, KeyboardEventHandler } from 'react'
+import { useEffect, useRef, KeyboardEventHandler, useState } from 'react'
 import './App.css'
 
 function App() {
   const divRef = useRef<HTMLDivElement>(null);
   const originalFontSizeRef = useRef<number | null>(null);
   const socketRef = useRef<WebSocket | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const isOverflown = (element: HTMLElement) => {
     return element.scrollHeight > element.clientHeight;
@@ -43,6 +44,7 @@ function App() {
       return;
     }
     socket.send(JSON.stringify({ type: 'FORM_DONE' }));
+    setIsSubmitting(true);
   }
 
   useEffect(() => {
@@ -55,12 +57,30 @@ function App() {
   }, []);
 
   useEffect(() => {
-    socketRef.current = new WebSocket('wss://haidoan-art.herokuapp.com:443');
-    return () => {
-      if (!socketRef.current) {
+    const socket = new WebSocket('wss://haidoan-art.herokuapp.com:443');
+
+    socket.addEventListener('message', (event) => {
+      let parsedData;
+
+      try {
+        parsedData = JSON.parse(event.data);
+      } catch {
         return;
       }
-      socketRef.current.close();
+
+      if (parsedData.type === 'TD_DONE') {
+        setIsSubmitting(false);
+        if (divRef.current) {
+          divRef.current.textContent = '';
+          divRef.current.focus();
+        }
+      }
+    });
+
+    socketRef.current = socket;
+
+    return () => {
+      socket.close();
       socketRef.current = null;
     };
   }, []);
@@ -69,10 +89,11 @@ function App() {
     <div className="App">
       <div
         ref={divRef}
-        className="dynamic-text"
-        contentEditable
+        className={`${isSubmitting ? 'is-submitting' : ''} dynamic-text`}
+        contentEditable={!isSubmitting}
         onInput={adaptFontSize}
         onKeyDown={detectEnterKeypress}
+        tabIndex={0}
       >
         Dynamic text
       </div>
