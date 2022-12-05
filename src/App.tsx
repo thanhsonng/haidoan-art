@@ -104,7 +104,7 @@ function App() {
       <textarea
         ref={textAreaRef}
         className="dynamic-text"
-        placeholder="Dynamic text"
+        placeholder="Your answer"
         autoFocus
         value={input}
         onChange={handleChange}
