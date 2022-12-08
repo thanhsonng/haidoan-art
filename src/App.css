@@ -30,7 +30,3 @@
   width: 0;
   height: 0;
 }
-
-.dynamic-text:disabled {
-  background-color: rgb(40, 40, 43);
-}
