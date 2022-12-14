@@ -24,6 +24,7 @@
   overflow-wrap: break-word;
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none;  /* Internet Explorer 10+ */
+  padding: 24px;
 }
 
 .dynamic-text::-webkit-scrollbar { /* WebKit */
