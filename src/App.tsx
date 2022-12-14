@@ -63,7 +63,7 @@ function App() {
   }, []);
 
   useEffect(() => {
-    const socket = new WebSocket('wss://haidoan-art.herokuapp.com:443');
+    const socket = new WebSocket(import.meta.env.VITE_WS_URL);
 
     socket.addEventListener('message', (event) => {
       if (event.data === 'ping') {
