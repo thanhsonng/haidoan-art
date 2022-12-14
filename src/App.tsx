@@ -54,6 +54,10 @@ function App() {
   }
 
   useEffect(() => {
+    document.title = import.meta.env.VITE_APP_TITLE;
+  }, []);
+
+  useEffect(() => {
     const textArea = textAreaRef.current;
     if (!textArea) {
       return;
